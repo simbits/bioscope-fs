@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -x
+
+case $1 in
+	add)
+		mount /dev/$2 /mnt
+		smjpeg_decode -f /mnt/movie.mjpg &
+		sleep 4
+		/usr/bin/enable_display.sh 200
+		echo 255 > /sys/class/leds/state2\:red\:state/brightness
+		echo $! > /var/run/smjpeg
+		;;
+	remove)
+		/usr/bin/disable_display.sh
+		umount /dev/$2
+		echo 0 > /sys/class/leds/state2\:red\:state/brightness
+		killall -s TERM smjpeg_decode
+		umount /dev/$2
+		;;
+esac
